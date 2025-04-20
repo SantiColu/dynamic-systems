@@ -1,4 +1,4 @@
-function [t, x] = run_flight_sim(h, V, gam, slp, d)
+function [t, x] = run_flight_sim(h, V, gam, slp, d, psi, phi)
   load('./A320_data.mat'); % carga la estructura 'data'
   old_path = addpath('./core');
   switch data.deriv 
@@ -49,12 +49,18 @@ function [t, x] = run_flight_sim(h, V, gam, slp, d)
   
   % Vector de estados (6GL)
   % x = { u v w p q r e1 e2 e3 h }
+  % e1 = phi
+  % e2 = tita
+  % e3 = psi
+
   xo = zeros(10,1);
   
   xo(1)  = V * cosd(AoA);  % u
   xo(2)  = V * sind(slp);  % v
   xo(3)  = V * sind(AoA);  % w
+  xo(7)  = phi;            % phi [rad]
   xo(8)  = pch*pi/180;     % θ [rad]
+%   xo(9)  = psi;            % psi [rad]
   xo(10) = h;              % altura [m] 
   
   % usamos ode23, que es menos preciso pero computacionalmente más liviano

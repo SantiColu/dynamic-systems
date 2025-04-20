@@ -7,10 +7,11 @@ force_sim_run = false;
 h   = 5000; % m
 V   = 130 ; % m/s
 gam = 0;    % γ
-slp = 0;    % β
-d   = 1;    % Δα / Δθ [⁰] - apartamiento inicial drespecto del equilibrio
+slp = 1;    % β
+d   = 0;    % Δα / Δθ [⁰]
+phi = 1; % [⁰] roll
 
-simName = sprintf("output/flight_sim_h%.0f_v%.1f_gam%.1f_slp%.1f_d%.1f.mat", h, V, gam, slp, d)
+simName = sprintf("output/flight_sim_h%.0f_v%.1f_gam%.1f_slp%.1f_d%.1f_ps%.1f_ph%.1f.mat", h, V, gam, slp, d, 0, phi);
 
 % ----------------------------  MODELO REAL ---------------------------- 
   if exist(simName, 'file')
@@ -29,7 +30,7 @@ simName = sprintf("output/flight_sim_h%.0f_v%.1f_gam%.1f_slp%.1f_d%.1f.mat", h, 
   if load_real
     load(simName)
   else
-    [t, x] = run_flight_sim(h, V, gam, slp, d);
+    [t, x] = run_flight_sim(h, V, gam, slp, d, psi*pi/180, phi*pi/180);
     save(simName, 'x', 't');
   end
   figure(1);
@@ -64,7 +65,7 @@ simName = sprintf("output/flight_sim_h%.0f_v%.1f_gam%.1f_slp%.1f_d%.1f.mat", h, 
   X_lng = zeros(4,length(t));
 
   % lng:
-  X0_lat = [0; 0; 0; 0];
+  X0_lat = [slp*pi/180; 0; 0; phi*pi/180];
   A_lat = mdl.lat.A;
   [V_lat,D_lat] = eig(A_lat);
   Z0_lat = V_lat\X0_lat;
@@ -102,44 +103,65 @@ simName = sprintf("output/flight_sim_h%.0f_v%.1f_gam%.1f_slp%.1f_d%.1f.mat", h, 
 % ---------------------------- MODELO LINEAL ---------------------------
 
 
-
 % ---------------------------- COMPARACION ---------------------------
   figure(3);
-  subplot(511); 
-    plot(t, x(:,1), "r;sim;");
+  subplot(421);
+    plot(t, x(:,1), "color", "#2443a8", ";sim;", "LineWidth", 2);
     hold on;
-    plot(t, mdl_res.u, "b;lineal;");
+    plot(t, mdl_res.u, "color", "#ff004c", ";lineal;", "LineWidth", 2);
     grid on; 
     ylabel('u [m/s]');
 
-  subplot(512); 
-    plot(t, atand(x(:,3)./x(:,1)), "r;sim;");
+  subplot(423); 
+    plot(t, atand(x(:,3)./x(:,1)), "color", "#2443a8", ";sim;", "LineWidth", 2);
     hold on;
-    plot(t, mdl_res.alfa, "b;lineal;");
+    plot(t, mdl_res.alfa, "color", "#ff004c", ";lineal;", "LineWidth", 2);
     grid on; 
     ylabel('\alpha [⁰]'); 
 
-  subplot(513); 
-    plot(t, x(:,8)*180/pi, "r;sim;");
+  subplot(425); 
+    plot(t, x(:,8)*180/pi, "color", "#2443a8", ";sim;", "LineWidth", 2);
     hold on;
-    plot(t, mdl_res.pitch*180/pi, "b;lineal;");
+    plot(t, mdl_res.pitch*180/pi, "color", "#ff004c", ";lineal;", "LineWidth", 2);
     grid on; 
     ylabel('\theta [⁰]');
 
-  subplot(514);
-    plot(t, x(:,3), "r;sim;");
+  subplot(427);
+    plot(t, x(:,3), "color", "#2443a8", ";sim;", "LineWidth", 2);
     hold on;
-    plot(t, mdl_res.w, "b;lineal;");
+    plot(t, mdl_res.w, "color", "#ff004c", ";lineal;", "LineWidth", 2);
     grid on;
     ylabel('w [m/s]');
 
-  subplot(515);
-    plot(t, x(:,10), "r;sim;");
-    hold on;
-    plot(t, mdl_res.h, "b;lineal;");
-    grid on;
-    ylabel('h [m]');
 
+
+  subplot(422);
+    plot(t, x(:,4)*180/pi, "color", "#2443a8", ";sim;", "LineWidth", 1.5);
+    hold on;
+    plot(t, X_lat(2, :)*180/pi, "color", "#ff004c", ";lineal;", "LineWidth", 1.5);
+    grid on; 
+    ylabel('p [⁰/s]');
+
+  subplot(424);
+    hold on;
+    plot(t, x(:,6)*180/pi, "color", "#2443a8", ";sim;", "LineWidth", 1.5);
+    plot(t, X_lat(3, :)*180/pi, "color", "#ff004c", ";lineal;", "LineWidth", 1.5);
+    grid on; 
+    ylabel('r [⁰/s]');
+
+  subplot(426); 
+    plot(t, atand(x(:,2)./x(:,1)), "color", "#2443a8", ";sim;", "LineWidth", 1.5);
+    hold on;
+    plot(t, X_lat(1, :)*180/pi, "color", "#ff004c", ";lineal;", "LineWidth", 1.5);
+    grid on; 
+    ylabel('\beta [⁰]'); 
+
+  subplot(428); 
+    plot(t, x(:,7)*180/pi, "color", "#2443a8", ";sim;", "LineWidth", 1.5);
+    hold on;
+    plot(t, X_lat(4, :)*180/pi, "color", "#ff004c", ";lineal;", "LineWidth", 1.5);
+    grid on; 
+    ylabel('\phi [⁰]');
 
 % ---------------------------- ANALISIS ---------------------------
 original_t = t;
@@ -168,10 +190,14 @@ function [max_indices, min_indices] = encontrar_extremos(y, include_first)
   end
 end
 
-function plot_extremos(fig, t, y, max_indices, min_indices)
+function plot_extremos(fig, t, y, max_indices, min_indices, leg, xa, ya, lineal)
   figure(fig);
-  plot(t,y);
+  h(1) = plot(t,y, "color", "#ff004c", [";" leg ";"], "LineWidth", 1.5);
   hold on;
+  if nargin >= 9
+    h(2) = plot(t,lineal, "color", "#2443a8", [";lineal;"], "LineWidth", 1.5);
+  end
+
   grid on;
   ylims = ylim();
 
@@ -182,6 +208,9 @@ function plot_extremos(fig, t, y, max_indices, min_indices)
   for i = min_indices
       plot([t(i), t(i)], ylims, 'm--'); 
   endfor
+  legend(h)
+  xlabel(xa);
+  ylabel(ya);
 end
 
 
@@ -199,7 +228,7 @@ y = x(:,1)(100:end);
 t = t(100:end);
 
 [max_indices, min_indices] = encontrar_extremos(y);
-plot_extremos(4, t, y, max_indices, min_indices);
+plot_extremos(4, t, y, max_indices, min_indices, "u", "tiempo [s]", "u [m/s]");
 
 % obtenemos los valores y tiempos de los maxs/mins
 % nos sacamos los primeros 2 porque tienen tambien el modo lento
@@ -226,10 +255,12 @@ a = exp(p(2));
 fitted_y = a * exp(amort * t);
 
 figure(5);
-plot(t,y-m, ";sim;");
+plot(t,y-m, ";sim;", "LineWidth", 1.5);
 hold on;
-plot(t,mdl_res.u(100:end)-m, ";lin;");
-plot(t,fitted_y, ";fitted_y;");
+plot(t,mdl_res.u(100:end)-m, ";lin;", "LineWidth", 1.5);
+plot(t,fitted_y, ";fitted_y;", "LineWidth", 1.5);
+xlabel("tiempo [s]");
+ylabel("u [m/s]");
 grid on;
 
 % calculamos los errores
@@ -257,7 +288,7 @@ y = atand(x(:,3)./x(:,1))(1:70);
 t = t(1:70);
 
 [max_indices, min_indices] = encontrar_extremos(y, 1);
-plot_extremos(6, t, y, max_indices, min_indices);
+plot_extremos(6, t, y, max_indices, min_indices, "alfa", "tiempo [s]", '\alpha [⁰]');
 
 % obtenemos los valores y tiempos de los maxs/mins
 y_max = y(max_indices);
@@ -283,10 +314,13 @@ a = exp(p(2));
 fitted_y = a * exp(amort * t);
 
 figure(7);
-plot(t,y-m, ";sim;");
+plot(t,y-m, ";sim;","LineWidth", 1.5);
 hold on;
-plot(t,fitted_y, ";fitted_y;");
+plot(t,mdl_res.alfa(1:70)-m, ";lin;", "LineWidth", 1.5);
+plot(t,fitted_y, ";fitted_y;","LineWidth", 1.5);
 grid on;
+xlabel("tiempo [s]");
+ylabel('\alpha [⁰]');
 
 error_f = (abs(f - f_lin)/f)*100;
 error_a = (abs(amort_lin - amort)/abs(amort))*100;
@@ -294,4 +328,37 @@ error_a = (abs(amort_lin - amort)/abs(amort))*100;
 disp("\n--- MODO RAPIDO ---")
 disp(sprintf("f_real: %f,\t f_lin: %f,\t error: %.1f%%", f, f_lin, error_f));
 disp(sprintf("amort_real: %f,\t amort_lin: %f,\t error: %.1f%%", amort, amort_lin, error_a));
+disp("---------------------\n")
+
+t = original_t;
+%  --- LATERAL --- 
+
+% frecuencia
+omega = imag(D_lat(1,1));
+f_lin = omega/(2*pi);
+
+% utilizamos beta (sim para conseguir la frecuencia)
+y = atand(x(:,2)./x(:,1))(1:300);
+t = t(1:300);
+
+[max_indices, min_indices] = encontrar_extremos(y, 1);
+plot_extremos(8, t, y, max_indices, min_indices, "beta", "tiempo [s]", '\beta [⁰]', (X_lat(1, :)*180/pi)(1:300));
+
+% obtenemos los valores y tiempos de los maxs/mins
+y_max = y(max_indices);
+t_max = t(max_indices);
+y_min = y(min_indices);
+t_min = t(min_indices);
+
+% sacamos el promedio del tiempo entre maximos y minimos
+Tmi = t_min(2)-t_min(1);
+Tma = t_max(2)-t_max(1);
+T = ((Tma+Tmi)/2);
+f = 1/T;
+
+error_f = (abs(f - f_lin)/f)*100;
+error_a = (abs(amort_lin - amort)/abs(amort))*100;
+
+disp("\n--- LATERAL ---")
+disp(sprintf("f_real: %f,\t f_lin: %f,\t error: %.1f%%", f, f_lin, error_f));
 disp("---------------------\n")
