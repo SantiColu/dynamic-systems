@@ -1,0 +1,23 @@
+DIAPOSITIVAS:
+A1)
+  - teoria modelo lineal
+  - teoria transformada a coordenadas modales
+  - overview del script
+  - resultados (matrices V y D) + minimas predicciones
+  - resultados (por encima, grafico de sim vs grafico de mdl)
+  - Comparacion:
+    - modelo long modo lento (f y amort) (3 casos)
+    - modelo long modo rapido (f y amort) (3 casos)
+    - modelo lat (graficos + frecuencia) (3 casos)
+
+A2)
+  - teoria parametros distribuidos
+  - resultados parametros distribuidos (frecuencias y formas)
+  - teoria parametros concetrados
+  - resultados concetrados distribuidos (frecuencias y formas) (5, 20, y 100 nodos)
+  - comparacion (frecuencias y formas) para n = 100
+  - CARATULA: MODELO DEL ALA
+  - valores de referencia y estrategia de modelado
+  - resultados de modelado (masa, inercia y rigidez)
+  - repaso procedimiento de concentrados
+  - resultados concentrados (frec y formas)
