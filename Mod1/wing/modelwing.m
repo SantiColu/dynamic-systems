@@ -14,7 +14,7 @@ function [M,K,x] = modelwing(n, fig)
 
   ixmot = round(XMotor/Le) + 1;
 
-  airfoil = load("airfoil.dat");
+  airfoil = load("/home/santi/UNLP/SistDinamicos/Mod1/wing/airfoil.dat");
   x_airf = airfoil(:, 1);
   y_airf = airfoil(:, 2);
 
@@ -77,22 +77,24 @@ function [M,K,x] = modelwing(n, fig)
     c = c + 1;
   end
 
-  figure(fig+1)
-  subplot(311)
-  plot(x, m,";Masa;", "LineWidth", 2)
-  hold on;
-  plot([XMotor, XMotor], ylim(), "r--;motor;", "LineWidth", 1.5)
-  xlabel('x [m]')
-  ylabel('Masa del elemento [kg]')
-  % plot([x(ixmot), x(ixmot)], ylim(), "m--;motor x;", "LineWidth", 1.5)
-  subplot(312)
-  plot(x, I,";I;", "LineWidth", 1.5)
-  hold on;
-  plot([XMotor, XMotor], ylim(), "r--;motor;", "LineWidth", 1.5)
-  subplot(313)
-  plot(x, J,";J;", "LineWidth", 2)
-  hold on;
-  plot([XMotor, XMotor], ylim(), "r--;motor;", "LineWidth", 1.5)
-  xlabel('x [m]')
-  ylabel('J [m^4]')
+  if fig != 0
+    figure(fig+1)
+    subplot(311)
+    plot(x, m,";Masa;", "LineWidth", 2)
+    hold on;
+    plot([XMotor, XMotor], ylim(), "r--;motor;", "LineWidth", 1.5)
+    xlabel('x [m]')
+    ylabel('Masa del elemento [kg]')
+    % plot([x(ixmot), x(ixmot)], ylim(), "m--;motor x;", "LineWidth", 1.5)
+    subplot(312)
+    plot(x, I,";I;", "LineWidth", 1.5)
+    hold on;
+    plot([XMotor, XMotor], ylim(), "r--;motor;", "LineWidth", 1.5)
+    subplot(313)
+    plot(x, J,";J;", "LineWidth", 2)
+    hold on;
+    plot([XMotor, XMotor], ylim(), "r--;motor;", "LineWidth", 1.5)
+    xlabel('x [m]')
+    ylabel('J [m^4]')
+  end
 end

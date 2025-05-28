@@ -22,8 +22,8 @@ format long
     end
 
     modelo = 'A320';
-    load(strcat('./', modelo, '_data'));
-    old_path = addpath('./core');
+    load(strcat('/home/santi/UNLP/SistDinamicos/Mod1/', modelo, '_data'));
+    old_path = addpath('/home/santi/UNLP/SistDinamicos/Mod1/core');
     
   
         mdl.gamma   = gam; % [⁰]
