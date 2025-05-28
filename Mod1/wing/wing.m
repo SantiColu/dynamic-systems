@@ -24,3 +24,17 @@ for h = 1:6
   grid on;
 end
 
+
+% -------- Modelo modo 1 --------
+
+modo1 = V(:, dIdx(1));
+modo1 = modo1 / max(abs(modo1));
+
+m_eq = (modo1' * M * modo1) ;
+k_eq = (modo1' * K * modo1) ;
+f_eq = sqrt(k_eq / m_eq) / (2*pi);
+
+fprintf('\n-------- Modelo modo 1 --------\n');
+fprintf('  m_eq:  %.2f kg\n', m_eq);
+fprintf('  k_eq:  %.2e N/m\n', k_eq);
+fprintf('  f_eq:  %.2f Hz\n', f_eq);
