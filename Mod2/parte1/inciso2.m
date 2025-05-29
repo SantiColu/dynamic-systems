@@ -1,5 +1,6 @@
 clear; close all;
 pkg load control;
+addpath("./functions")
 
 % condición de vuelo
 h   = 1000; % m
@@ -16,17 +17,7 @@ alfa = mdl.alfa*pi/180;
 
 addpath('../../Mod1/wing');
 N = 100;
-[M,K,x] = modelwing(N,0);
-% cuerda
-% area 
-% l
-% S = sum(areas)
-
-AreaT = 0;
-
-CL = W/2*g/(q*AreaT*alfa);
-
-
+[M,K,x,elements] = modelwing(N,0);
 
 
 % TODO: revisar matriz C
@@ -34,8 +25,14 @@ C = zeros(1, 2*N);
 C(3) = K(3,2);
 C(4) = K(4,2);
 
-% TODO: definir matriz F
+% Matriz F
+At = sum(elements.area);
+CL = W/2*g/(q*At*alfa);
+
 F = zeros(2*N, 1);
+for i = 1:N
+  F(2*i-1) = q*CL*elements.area(i);
+end
 
 % Empotramos la raiz del ala
 M = M(3:end, 3:end);
@@ -65,7 +62,7 @@ P_b = P(idx_b, :); %TODO: entender bien esto
 C_a = C(:, idx_a); %TODO: entender bien esto
 C_b = C(:, idx_b); %TODO: entender bien esto
 
-chi = 0.02;
+chi = 0.05;
 
 % Modelo de estados
 A = [zeros(nr)   eye(nr)
@@ -89,11 +86,12 @@ outputName = {"M_raiz"};
 Mss = ss(A, B, C, D, 'StateName', stateName, 'InputName', inputName, 'OutputName', outputName);
 
 
+% TODO: revisar esto, unidades? tiene sentido el Orden de Magnitud?
 % Rafaga (1-cos)
 H = 9.144;
 Uw = 10;
-[t,u] = modelBurst("1-cos", H, Uw, U, 2.5);
-[y, ~] = lsim(Mss, u, t);
+[t,u] = modelBurst("1-cos", H, Uw, U, 30);
+[m, ~] = lsim(Mss, u, t);
 
 figure(2);
 subplot(2, 1, 1);
@@ -101,11 +99,13 @@ plot(t, u, "LineWidth", 2);
 title('Rafaga (1-cos)');
 xlabel('t [s]');
 ylabel('u [m/s]');
+grid on;
 hold on;
 
 subplot(2, 1, 2);
-plot(t, y, "LineWidth", 2);
+plot(t, m, "LineWidth", 2);
 xlabel('t [s]');
-ylabel('y [m/s^2]');
-title('Respuesta');
+ylabel('M [?]');
+title('Respuesta (M_{raiz})');
+grid on;
 hold on;

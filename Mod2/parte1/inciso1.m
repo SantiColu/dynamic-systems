@@ -36,6 +36,7 @@ for i = 1:length(Hr)
   title('Rafaga (1-cos)');
   xlabel('t [s]');
   ylabel('u [m/s]');
+  grid on;
   hold on;
 
   subplot(2, 1, 2);
@@ -43,6 +44,7 @@ for i = 1:length(Hr)
   xlabel('t [s]');
   ylabel('y [m/s^2]');
   title('Respuesta');
+  grid on;
   hold on;
 
   [ym, im] = max(abs(y));
@@ -67,6 +69,7 @@ plot(t, u, "LineWidth", 2);
 title('Rafaga (escalon)');
 xlabel('t [s]');
 ylabel('u [m/s]');
+grid on;
 hold on;
 
 subplot(2, 1, 2);
@@ -74,6 +77,7 @@ plot(t, y, "LineWidth", 2);
 xlabel('t [s]');
 ylabel('y [m/s^2]');
 title('Respuesta');
+grid on;
 hold on;
 
 % TODO: revisar metodo 2
