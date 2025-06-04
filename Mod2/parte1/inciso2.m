@@ -10,7 +10,7 @@ addpath('../../Mod1/mdl');
 mdl = A320_build_model(1, h, V/1.852*3.6, 0, false, false, 0, 0);
 g = mdl.g;
 rho = mdl.rho;
-U = mdl.speed;
+U = mdl.speed * cosd(mdl.alfa);
 W = mdl.mass;
 q = mdl.q;
 alfa = mdl.alfa*pi/180;
@@ -19,8 +19,6 @@ addpath('../../Mod1/wing');
 N = 100;
 [M,K,x,elements] = modelwing(N,0);
 
-
-% TODO: revisar matriz C
 C = zeros(1, 2*N);
 C(3) = K(3,2);
 C(4) = K(4,2);
@@ -40,6 +38,11 @@ K = K(3:end, 3:end);
 C = C(3:end);
 F = F(3:end);
 
+% Momento estatico
+Fe = F.*alfa;
+q0 = K\Fe;
+M0 = C*q0;
+
 K_ = M\K;
 F_ = M\F;
 [V,L] = eig(K_, 'vector');
@@ -57,10 +60,10 @@ idx_b = LIdx(1:nr);
 
 L_a = diag(L(idx_a));
 L_b = diag(L(idx_b));
-P_a = P(idx_a, :); %TODO: entender bien esto
-P_b = P(idx_b, :); %TODO: entender bien esto
-C_a = C(:, idx_a); %TODO: entender bien esto
-C_b = C(:, idx_b); %TODO: entender bien esto
+P_a = P(idx_a, :);
+P_b = P(idx_b, :);
+C_a = C(:, idx_a);
+C_b = C(:, idx_b);
 
 chi = 0.05;
 
@@ -85,15 +88,14 @@ outputName = {"M_raiz"};
 
 Mss = ss(A, B, C, D, 'StateName', stateName, 'InputName', inputName, 'OutputName', outputName);
 
-
-% TODO: revisar esto, unidades? tiene sentido el Orden de Magnitud?
 % Rafaga (1-cos)
 H = 9.144;
 Uw = 10;
-[t,u] = modelBurst("1-cos", H, Uw, U, 30);
+[t,ww] = modelBurst("1-cos", H, Uw, U, 30);
+u = ww/(mdl.speed*cos(alfa));
 [m, ~] = lsim(Mss, u, t);
 
-figure(2);
+figure(1);
 subplot(2, 1, 1);
 plot(t, u, "LineWidth", 2);
 title('Rafaga (1-cos)');
@@ -103,9 +105,31 @@ grid on;
 hold on;
 
 subplot(2, 1, 2);
-plot(t, m, "LineWidth", 2);
+plot(t, m + M0, "LineWidth", 2);
 xlabel('t [s]');
-ylabel('M [?]');
+ylabel('M [Nm]');
+title('Respuesta (M_{raiz})');
+grid on;
+hold on;
+
+
+[t,ww] = modelBurst("step", H, Uw, U, 30);
+u = ww/(mdl.speed*cos(alfa));
+[m, ~] = lsim(Mss, u, t);
+
+figure(2);
+subplot(2, 1, 1);
+plot(t, u, "LineWidth", 2);
+title('Rafaga (Escalon)');
+xlabel('t [s]');
+ylabel('u [m/s]');
+grid on;
+hold on;
+
+subplot(2, 1, 2);
+plot(t, m + M0, "LineWidth", 2);
+xlabel('t [s]');
+ylabel('M [Nm]');
 title('Respuesta (M_{raiz})');
 grid on;
 hold on;

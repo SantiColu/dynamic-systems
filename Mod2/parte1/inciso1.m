@@ -28,7 +28,6 @@ for i = 1:length(Hr)
   H = Hr(i);
   [t,u] = modelBurst("1-cos",H, Uw, U, 5);
   [y, ~] = lsim(M_, u, t);
-  % TODO: revisar unidades y si tengo que restar/sumar algo
 
   figure(1);
   subplot(2, 1, 1);
@@ -40,21 +39,21 @@ for i = 1:length(Hr)
   hold on;
 
   subplot(2, 1, 2);
-  plot(t, y, "LineWidth", 2,sprintf(';H = %.1f m;', H));
+  plot(t, y-mdl.g, "LineWidth", 2,sprintf(';H = %.1f m;', H));
   xlabel('t [s]');
-  ylabel('y [m/s^2]');
+  ylabel('FC [m/s^2]');
   title('Respuesta');
   grid on;
   hold on;
 
-  [ym, im] = max(abs(y));
+  [ym, im] = max(abs(y-mdl.g));
   if ym > abs(Ymax(2))
-    Ymax = [i, y(im)];
+    Ymax = [i, y(im)-mdl.g];
   end
 endfor
 
 subplot(2, 1, 2);
-plot(xlim(), [Ymax(2), Ymax(2)], 'r--', "LineWidth", 1.5);
+plot(xlim(), [Ymax(2), Ymax(2)], 'r--;FC_{max};', "LineWidth", 1.5);
 text(xlim()(2), Ymax(2)*0.9, sprintf('Ymax = %.2f m/s^2', Ymax(2)), 'VerticalAlignment', 'bottom', 'HorizontalAlignment', 'right', "color", "red");
 
 
@@ -73,9 +72,9 @@ grid on;
 hold on;
 
 subplot(2, 1, 2);
-plot(t, y, "LineWidth", 2);
+plot(t, y-mdl.g, "LineWidth", 2);
 xlabel('t [s]');
-ylabel('y [m/s^2]');
+ylabel('FC [m/s^2]');
 title('Respuesta');
 grid on;
 hold on;

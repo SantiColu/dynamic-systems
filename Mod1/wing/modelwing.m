@@ -1,4 +1,4 @@
-function [M,K,x] = modelwing(n, fig)
+function [M,K,x, elements] = modelwing(n, fig)
   L = 15.075; %m
   RhoAl = 2700; %kg/m^3
   RhoJA1 = 800; %kg/m^3
@@ -17,6 +17,8 @@ function [M,K,x] = modelwing(n, fig)
   airfoil = load("/home/santi/UNLP/SistDinamicos/Mod1/wing/airfoil.dat");
   x_airf = airfoil(:, 1);
   y_airf = airfoil(:, 2);
+
+  elements.x = x;
 
   if fig != 0
     figure(fig)
@@ -65,6 +67,11 @@ function [M,K,x] = modelwing(n, fig)
     M(2*i - 1, 2*i - 1) =  m(i);
     M(2*i, 2*i) = I(i);
     masa = masa + m(i);
+
+    elements.mass(i) = masa;
+    elements.area(i) = b*h;
+    elements.c(i) = b;
+    elements.l(i) = Le;
 
     J(i) = (b*h^3)/12;
   endfor
