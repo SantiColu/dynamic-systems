@@ -1,4 +1,4 @@
-function [M,K,r] = femPala()
+function [M,K,r,c] = femPala()
   load("AOC_15_50.mat")
 
   % longitud de cada elemento
