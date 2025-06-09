@@ -1,5 +1,7 @@
 close all; clear;
 
+addpath("./functions")
+
 [Mp, Kp, rp] = femPala();
 N = length(rp);
 

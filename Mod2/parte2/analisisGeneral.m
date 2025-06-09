@@ -1,7 +1,9 @@
 close all; clear;
 
-[M,K] = femGeneral();
+addpath("./functions")
 
+
+[M,K] = femGeneral();
 
 % Análisis modal
 K_ = M\K;

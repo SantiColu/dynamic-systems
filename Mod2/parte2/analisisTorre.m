@@ -1,5 +1,7 @@
 close all; clear;
 
+addpath("./functions")
+
 [Mt, Kt, xt] = femTorre();
 
 N = length(xt);
