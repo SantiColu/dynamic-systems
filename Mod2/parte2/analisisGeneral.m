@@ -12,7 +12,7 @@ K_ = M\K;
 f = real(sqrt(D_s)/(2*pi)); %frecuencias de los modos en hz
 
 % Nos quedamos solo con algunas
-f = f(1:3*4);
+f = f(1:2*4);
 
 % Mostrar frecuencias
 disp('Frecuencias naturales [Hz]:');
@@ -23,8 +23,8 @@ disp('Frecuencias naturales [RPM]:');
 disp(f*60);
 
 % Graficar frecuencias
-plotProhibidas(1, f, 'Frecuencia (Hz)', 'Zonas prohibidas', 'Zonas de frecuencia prohibidas unidas (±10%)')
-plotProhibidas(2, f *60, 'Frecuencia (RPM)', 'Zonas prohibidas', 'Zonas de frecuencia prohibidas unidas (±10%)')
+plotProhibidas(1, f, 'Frecuencia (Hz)', 'Zonas prohibidas', 'Zonas de frecuencia prohibidas (±10%)')
+plotProhibidas(2, f *60, 'Frecuencia (RPM)', 'Zonas prohibidas', 'Zonas de frecuencia prohibidas (±10%)')
 
 
 
