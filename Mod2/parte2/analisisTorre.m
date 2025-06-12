@@ -17,9 +17,9 @@ Wt = sqrt(Dt_s)/(2*pi); %frecuencias de los modos en hz
 
 figure(3)
 for h = 1:6
-  subplot(3,2,h)
+  subplot(2,3,h)
   v = [0;Vt((1:2:2*(N-1)),dtIdx(h))];
-  plot(xt, -(1/max(abs(v)))*v, "LineWidth", 2)
+  plot(-(1/max(abs(v)))*v, xt, "LineWidth", 2)
   title(["Modo ", num2str(h) " (" num2str(Wt(h)) "Hz)"])
 
   grid on;
