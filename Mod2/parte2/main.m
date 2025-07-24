@@ -155,3 +155,9 @@ xlabel('Frecuencia [rad/s]');
 ylabel('Desfasaje [grados]');
 title('Desfasaje');
 grid on;
+
+figure(4);
+plot(w_rng * 30/pi, M_w - M0_w, 'b', 'LineWidth', 1.5);
+xlabel('Frecuencia [RPM]');
+ylabel('Momento (variable) [Nm]');
+grid on;
